@@ -23,6 +23,11 @@ public class Movement : MonoBehaviour
                 horizontal = 0;
             }
         }
+
+        if (Input.GetKeyDown("x"))
+        {
+            animator.SetTrigger("isAttack");
+        }
         FixedUpdate();
         
     }
@@ -39,6 +44,14 @@ public class Movement : MonoBehaviour
         if (beforeVertical != vertical)
         {
             animator.SetFloat("ySpeed", vertical);
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D hitinfo)
+    {
+        if (hitinfo.gameObject.tag == "Enemy")
+        {
+            animator.SetTrigger("isAttack");
         }
     }
 }
