@@ -5,9 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class roomEnter : MonoBehaviour
 {
-    void Update() {
-        
-    }
     void  OnTriggerEnter2D(Collider2D hitInfo)
     {
         if (hitInfo.gameObject.tag == "Player")
