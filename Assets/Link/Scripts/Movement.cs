@@ -8,8 +8,14 @@ public class Movement : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     private float horizontal;
     private float vertical;
-
+    private float attackRange = 0.5f;
+    private Vector2 attackPosition;
+    public Transform attackPointUp;
+    public Transform attackPointDown;
+    public Transform attackPointLeft;
+    public Transform attackPointRight;
     public Animator animator;
+    public LayerMask enemyLayers;
     
     void Update()
     {
@@ -24,34 +30,95 @@ public class Movement : MonoBehaviour
             }
         }
 
+        FixedUpdate();
+
         if (Input.GetKeyDown("x"))
         {
             animator.SetTrigger("isAttack");
+            Attack();
         }
-        FixedUpdate();
-        
     }
 
     void FixedUpdate()
     {
-        float beforeHorizontal = rb.velocity.x / speed;
-        float beforeVertical = rb.velocity.y / speed;
         rb.velocity = new Vector2(horizontal * speed, vertical * speed);
-        if (beforeHorizontal != horizontal)
+        animator.SetFloat("xSpeed", horizontal);
+        animator.SetFloat("ySpeed", vertical);
+        if (isLookingRight()){
+            attackPosition = attackPointRight.position;
+        } else if (isLookingLeft())
         {
-            animator.SetFloat("xSpeed", horizontal);
-        } 
-        if (beforeVertical != vertical)
+            attackPosition = attackPointLeft.position;
+        } else if (isLookingDown())
         {
-            animator.SetFloat("ySpeed", vertical);
+            attackPosition = attackPointDown.position;
+        } else if (isLookingUp())
+        {
+            attackPosition = attackPointUp.position;
         }
     }
-
-    void OnCollisionEnter2D(Collision2D hitinfo)
+    private void Attack()
     {
-        if (hitinfo.gameObject.tag == "Enemy")
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPosition, attackRange, enemyLayers);
+        if (hitEnemies.Length > 0)
         {
-            animator.SetTrigger("isAttack");
+            Debug.Log("Enemy Hit");
+        }
+    }
+    void OnDrawGizmos() {
+        DrawCircle(attackPosition, attackRange);
+    }
+    private void DrawCircle(Vector2 centerPoint, float radius)
+    {
+        float angleSteps = 360f/100;
+        Vector3 previousPoint = centerPoint + Vector2.right * radius;
+        for (int i = 0; i <= 100; i++)
+        {
+            float angle = i*angleSteps;
+            float rad = Mathf.Deg2Rad*angle;
+            Vector2 newPoint = centerPoint + new Vector2(Mathf.Cos(rad)*radius, Mathf.Sin(rad)*radius);
+            Gizmos.DrawLine(previousPoint, newPoint);
+            previousPoint = new Vector2(newPoint.x, newPoint.y);
+        }
+    }
+    private bool isLookingRight()
+    {
+        if (horizontal > 0){
+            return true;
+        } else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Right")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private bool isLookingLeft()
+    {
+        if (horizontal < 0){
+            return true;
+        } else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Left")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private bool isLookingUp()
+    {
+        if (vertical > 0){
+            return true;
+        } else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Up")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private bool isLookingDown()
+    {
+        if (vertical < 0){
+            return true;
+        } else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Down")){
+            return true;
+        } else {
+            return false;
         }
     }
 }
