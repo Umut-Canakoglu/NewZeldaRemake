@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class NPC : MonoBehaviour
 {
     public GameObject dialoguePanel;
-    public Text dialogueText;
-
+    public TMP_Text dialogueText;
     public GameObject contButton;
     public string[] dialogue;
     private int index;
